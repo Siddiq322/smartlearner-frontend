@@ -1,6 +1,6 @@
 import { StudyPlan, StudyTask, UserProfile } from "@/types/study";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5013/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://smartlearner-backend-2.onrender.com/api';
 
 class ApiClient {
   private baseURL: string;
