@@ -65,6 +65,27 @@ const updateTask = async (req, res) => {
   }
 };
 
+const deleteTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const task = await Task.findOneAndDelete({
+      _id: id,
+      userId: req.user._id
+    });
+
+    if (!task) {
+      return res.status(404).send({ error: 'Task not found' });
+    }
+
+    // Regenerate daily plan after deleting task
+    await generateDailyPlanFromTasks(req.user._id);
+
+    res.send({ message: 'Task deleted successfully', task });
+  } catch (error) {
+    res.status(400).send({ error: error.message });
+  }
+};
+
 const carryForwardTasks = async (req, res) => {
   try {
     const yesterday = new Date();
@@ -118,4 +139,4 @@ const getDailyPlan = async (req, res) => {
   }
 };
 
-module.exports = { addTask, getTasks, updateTask, carryForwardTasks, getDailyPlan };
+module.exports = { addTask, getTasks, updateTask, deleteTask, carryForwardTasks, getDailyPlan };

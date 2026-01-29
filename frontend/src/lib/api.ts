@@ -134,6 +134,12 @@ class ApiClient {
       body: JSON.stringify(data),
     });
   }
+
+  async deleteTask(taskId: string) {
+    return this.request(`/tasks/${taskId}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export const api = new ApiClient(API_BASE_URL);

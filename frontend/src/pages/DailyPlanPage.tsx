@@ -7,6 +7,7 @@ import {
   Circle,
   BookOpen,
   Plus,
+  Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
@@ -49,6 +50,18 @@ const DailyPlanPage = () => {
     },
     onError: (error) => {
       toast.error("Failed to update task");
+      console.error(error);
+    },
+  });
+
+  const deleteTaskMutation = useMutation({
+    mutationFn: (taskId: string) => api.deleteTask(taskId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      toast.success("Task deleted!");
+    },
+    onError: (error) => {
+      toast.error("Failed to delete task");
       console.error(error);
     },
   });
@@ -200,6 +213,18 @@ const DailyPlanPage = () => {
                     <Clock size={14} />
                     {Math.round(task.duration / 60)}m
                   </div>
+
+                  {task.completed && (
+                    <motion.button
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
+                      onClick={() => deleteTaskMutation.mutate(task._id)}
+                      whileTap={{ scale: 0.8 }}
+                      disabled={deleteTaskMutation.isPending}
+                      title="Delete completed task"
+                    >
+                      <Trash2 size={16} />
+                    </motion.button>
+                  )}
                 </GlassCard>
               </motion.div>
             ))
