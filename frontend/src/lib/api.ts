@@ -13,6 +13,13 @@ class ApiClient {
     const url = `${this.baseURL}${endpoint}`;
     const token = localStorage.getItem('token');
 
+    console.log('API Request:', {
+      url,
+      method: options.method || 'GET',
+      hasToken: !!token,
+      endpoint
+    });
+
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
@@ -22,14 +29,28 @@ class ApiClient {
       ...options,
     };
 
-    const response = await fetch(url, config);
+    try {
+      const response = await fetch(url, config);
+      console.log('API Response:', {
+        url,
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
+      });
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Network error' }));
-      throw new Error(error.error || `HTTP ${response.status}`);
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Network error' }));
+        console.error('API Error:', error);
+        throw new Error(error.error || `HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('API Success:', data);
+      return data;
+    } catch (error) {
+      console.error('API Request failed:', error);
+      throw error;
     }
-
-    return response.json();
   }
 
   // Authentication

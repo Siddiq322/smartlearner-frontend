@@ -44,6 +44,13 @@ app.get('/', (req, res) => {
 
 // 404 handler for undefined routes
 app.use('*', (req, res) => {
+  console.log('404 HANDLER - Route not found:', {
+    method: req.method,
+    url: req.url,
+    originalUrl: req.originalUrl,
+    baseUrl: req.baseUrl,
+    path: req.path
+  });
   res.status(404).json({
     error: 'Route not found',
     message: `Cannot ${req.method} ${req.originalUrl}`,
@@ -52,7 +59,11 @@ app.use('*', (req, res) => {
       'POST /api/auth/register',
       'POST /api/auth/login',
       'GET /api/auth/profile',
-      'PATCH /api/auth/profile'
+      'PATCH /api/auth/profile',
+      'POST /api/tasks/add',
+      'GET /api/tasks',
+      'PUT /api/tasks/:id',
+      'DELETE /api/tasks/:id'
     ]
   });
 });
