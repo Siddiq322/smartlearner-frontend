@@ -214,17 +214,15 @@ const DailyPlanPage = () => {
                     {Math.round(task.duration / 60)}m
                   </div>
 
-                  {task.completed && (
-                    <motion.button
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
-                      onClick={() => deleteTaskMutation.mutate(task._id)}
-                      whileTap={{ scale: 0.8 }}
-                      disabled={deleteTaskMutation.isPending}
-                      title="Delete completed task"
-                    >
-                      <Trash2 size={16} />
-                    </motion.button>
-                  )}
+                  <motion.button
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
+                    onClick={() => deleteTaskMutation.mutate(task._id)}
+                    whileTap={{ scale: 0.8 }}
+                    disabled={deleteTaskMutation.isPending}
+                    title="Delete task"
+                  >
+                    <Trash2 size={16} />
+                  </motion.button>
                 </GlassCard>
               </motion.div>
             ))
