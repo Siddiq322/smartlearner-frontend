@@ -55,14 +55,22 @@ const DailyPlanPage = () => {
   });
 
   const deleteTaskMutation = useMutation({
-    mutationFn: (taskId: string) => api.deleteTask(taskId),
-    onSuccess: () => {
+    mutationFn: async (taskId: string) => {
+      console.log('Attempting to delete task:', taskId);
+      const result = await api.deleteTask(taskId);
+      console.log('Delete API response:', result);
+      return result;
+    },
+    onSuccess: (data) => {
+      console.log('Delete success:', data);
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       toast.success("Task deleted!");
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error('Delete task error details:', error);
+      console.error('Error response:', error?.response?.data);
+      console.error('Error status:', error?.response?.status);
       toast.error("Failed to delete task");
-      console.error(error);
     },
   });
 

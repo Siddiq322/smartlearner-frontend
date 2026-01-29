@@ -70,20 +70,39 @@ const updateTask = async (req, res) => {
 const deleteTask = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log('DELETE TASK REQUEST:');
+    console.log('- Task ID:', id);
+    console.log('- User ID:', req.user?._id);
+    console.log('- Auth header:', req.header('Authorization') ? 'Present' : 'Missing');
+
     const task = await Task.findOneAndDelete({
       _id: id,
       userId: req.user._id
     });
 
+    console.log('- Task found:', !!task);
+    if (task) {
+      console.log('- Task details:', { id: task._id, title: task.title, userId: task.userId });
+    }
+
     if (!task) {
+      console.log('- Returning 404: Task not found');
       return res.status(404).send({ error: 'Task not found' });
     }
 
-    // Regenerate daily plan after deleting task
-    await generateDailyPlanFromTasks(req.user._id);
+    // Try to regenerate daily plan after deleting task, but don't fail if it errors
+    try {
+      await generateDailyPlanFromTasks(req.user._id);
+      console.log('- Daily plan regenerated successfully');
+    } catch (planError) {
+      console.error('Error regenerating daily plan after task deletion:', planError);
+      // Don't fail the delete operation if plan regeneration fails
+    }
 
+    console.log('- Task deleted successfully');
     res.send({ message: 'Task deleted successfully', task });
   } catch (error) {
+    console.error('Delete task error:', error);
     res.status(400).send({ error: error.message });
   }
 };
