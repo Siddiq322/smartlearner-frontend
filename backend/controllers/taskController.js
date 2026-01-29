@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Task = require('../models/Task');
 const User = require('../models/User');
 const DailyPlan = require('../models/DailyPlan');
@@ -46,8 +47,14 @@ const updateTask = async (req, res) => {
   try {
     const { id } = req.params;
     const { completed } = req.body;
+
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send({ error: 'Invalid task ID format' });
+    }
+
     const task = await Task.findOneAndUpdate(
-      { _id: id, userId: req.user._id },
+      { _id: new mongoose.Types.ObjectId(id), userId: req.user._id },
       { completed },
       { new: true }
     );
@@ -68,12 +75,23 @@ const updateTask = async (req, res) => {
 const deleteTask = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log('Delete task request - ID:', id, 'User ID:', req.user._id);
+
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      console.log('Invalid ObjectId format:', id);
+      return res.status(400).send({ error: 'Invalid task ID format' });
+    }
+
     const task = await Task.findOneAndDelete({
-      _id: id,
+      _id: new mongoose.Types.ObjectId(id),
       userId: req.user._id
     });
 
+    console.log('Task found for deletion:', task);
+
     if (!task) {
+      console.log('Task not found for deletion');
       return res.status(404).send({ error: 'Task not found' });
     }
 
@@ -82,6 +100,7 @@ const deleteTask = async (req, res) => {
 
     res.send({ message: 'Task deleted successfully', task });
   } catch (error) {
+    console.error('Delete task error:', error);
     res.status(400).send({ error: error.message });
   }
 };
